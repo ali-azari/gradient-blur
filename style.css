@@ -1,35 +1,41 @@
 .gradient-blur {
+  --layer-count: 8; /* Number of "gradient-blur" layers */
+  --blur-intensity: 0.33; /* Higher values lead to a more intense blur */
+  --blur-depth: 1.8; /* Higher values increases the blur gradient */
+  --blur-direction: bottom; /* Specifies the blur direction. Allowed values: "top", "bottom", "left", "right". */
+
+  --mask-step: calc(100% / var(--layer-count));
   position: relative;
   width: 100%;
   height: 100%;
-  pointer-events: none;
 
   & > * {
     --layer-number: attr(data-layer number);
-    --blur-intensity: calc(pow(1.8, var(--layer-number)) * 0.33px);
-    --mask-step-1: clamp(0%, calc((var(--layer-number) - 1) * 12.5%), 100%);
-    --mask-step-2: clamp(0%, calc(var(--layer-number) * 12.5%), 100%);
-    --mask-step-3: clamp(0%, calc((var(--layer-number) + 1) * 12.5%), 100%);
-    --mask-step-4: clamp(0%, calc((var(--layer-number) + 2) * 12.5%), 100%);
+    --layer-blur: calc(pow(var(--blur-depth), var(--layer-number)) * var(--blur-intensity) * 1px);
+    --mask-stop-1: clamp(0%, calc((var(--layer-number) - 1) * var(--mask-step)), 100%);
+    --mask-stop-2: clamp(0%, calc(var(--layer-number) * var(--mask-step)), 100%);
+    --mask-stop-3: clamp(0%, calc((var(--layer-number) + 1) * var(--mask-step)), 100%);
+    --mask-stop-4: clamp(0%, calc((var(--layer-number) + 2) * var(--mask-step)), 100%);
 
     position: absolute;
     inset: 0;
+    pointer-events: none;
     z-index: var(--layer-number);
-    backdrop-filter: blur(var(--blur-intensity));
-    -webkit-backdrop-filter: blur(var(--blur-intensity));
+    backdrop-filter: blur(var(--layer-blur));
+    -webkit-backdrop-filter: blur(var(--layer-blur));
     mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0) var(--mask-step-1),
-      rgba(0, 0, 0, 1) var(--mask-step-2),
-      rgba(0, 0, 0, 1) var(--mask-step-3),
-      rgba(0, 0, 0, 0) var(--mask-step-4)
+      to var(--blur-direction),
+      rgba(0, 0, 0, 0) var(--mask-stop-1),
+      rgba(0, 0, 0, 1) var(--mask-stop-2),
+      rgba(0, 0, 0, 1) var(--mask-stop-3),
+      rgba(0, 0, 0, 0) var(--mask-stop-4)
     );
     -webkit-mask-image: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0) var(--mask-step-1),
-      rgba(0, 0, 0, 1) var(--mask-step-2),
-      rgba(0, 0, 0, 1) var(--mask-step-3),
-      rgba(0, 0, 0, 0) var(--mask-step-4)
+      to var(--blur-direction),
+      rgba(0, 0, 0, 0) var(--mask-stop-1),
+      rgba(0, 0, 0, 1) var(--mask-stop-2),
+      rgba(0, 0, 0, 1) var(--mask-stop-3),
+      rgba(0, 0, 0, 0) var(--mask-stop-4)
     );
   }
 }
